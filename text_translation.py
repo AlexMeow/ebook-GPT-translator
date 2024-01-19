@@ -150,8 +150,8 @@ def random_api_key():
     return random.choice(key_array)
 
 def create_chat_completion(prompt, text, model="gpt-3.5-turbo", **kwargs):
-    openai.api_key = random_api_key()
-    return openai.ChatCompletion.create(
+    client = openai.Client(api_key=random_api_key())
+    return client.chat.completions.create(
         model=model,
         messages=[
             {
@@ -316,9 +316,9 @@ def translate_text(text):
     try:
         completion = create_chat_completion(prompt, text)
         t_text = (
-            completion["choices"][0]
-            .get("message")
-            .get("content")
+            completion.choices[0]
+            .message
+            .content
             .encode("utf8")
             .decode()
         )
@@ -334,14 +334,14 @@ def translate_text(text):
 
         completion = create_chat_completion(prompt, text)
         t_text = (
-            completion["choices"][0]
-            .get("message")
-            .get("content")
+            completion.choices[0]
+            .message
+            .content
             .encode("utf8")
             .decode()
         )
         # Get the token usage from the API response
-        cost_tokens += completion["usage"]["total_tokens"]
+        cost_tokens += completion.usage.total_tokens
 
     return t_text
 
